@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Live</title>
+  <style>
+    label {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!--
+  interface BloqueDeTiempo {
+   descripcion: string; ✅
+   id: number;
+   nombre: string; ✅
+   configuracion: {
+     aspecto: AspectoTipo; // Determina. Si el gráfico se va a ver en formato circular o lineal.
+     cuenta_regresiva: boolean; // Indica después de un porcentaje Si el tiempo va a correr Hacia atrás
+     tiempo_restante: number; // Indica a partir de cuánto porcentaje se iniciará la cuenta regresiva.
+     duracion: number;
+     unidad: UnidadTipo;
+     visualizacion: VisualizacionTipo;
+     visualizar_decimales: boolean;
+     icono: string;
+     configuracion_general: {
+      diseño: {
+        alto: number;
+        color: string;
+        escala_del_texto: number;
+        intensidad_resplandor: number;
+        mostrar_decimales: boolean;
+        ocultar_texto: boolean;
+        tipo_de_borde: "redondo" | "cuadrado" | "plano";
+      }
+     }
+     configuracion_circular: {
+       visualizacion: {
+         margen_interno: number;
+         punto_de_inicio: PuntoDeInicioTipo;
+         direccion_horario: DireccionHorarioTipo;     
+       }
+     }
+     configuracion_lineal: {
+      visualizacion: {
+        alineacion_horizontal: "izquierda" | "derecha" | "centro";
+        alineacion_vertical: "arriba" | "abajo";
+        separacion: number;
+      }
+     }
+   };
+  }
+    -->
+  <form>
+    <label>
+      <span>Id</span>
+      <input name="id">
+    </label>
+    <label>
+      <span>Nombre</span>
+      <input name="nombre">
+    </label>
+    <label>
+      <span>Descripción</span>
+      <input name="descripcion">
+    </label>
+    <label>
+      <span>Aspecto</span>
+      <select name="configuracion.aspecto">
+        <option value="">Seleccione una opción</option>
+        <option>Circular</option>
+        <option>Lineal</option>
+      </select>
+    </label>
+    <label>
+      <span>Cuenta regresiva</span>
+      <input type="checkbox" name="configuracion.cuenta_regresiva">
+    </label>
+    <label>
+      <span>Tiempo restante (%)</span>
+      <input name="configuracion.tiempo_restante">
+    </label>
+    <label>
+      <span>Duración</span>
+      <input name="configuracion.duracion">
+    </label>
+    <label>
+      <span>Unidad</span>
+      <select name="configuracion.unidad">
+        <option value="">Seleccione una opción</option>
+        <option>Segundos</option>
+        <option>Minutos</option>
+        <option>Horas</option>
+      </select>
+    </label>
+    <label>
+      <span>Visualización</span>
+      <select name="configuracion.visualizacion">
+        <option value="">Seleccione una opción</option>
+        <option>Progreso</option>
+        <option>Contador</option>
+      </select>
+    </label>
+    <label>
+      <span>Visualizar decimales</span>
+      <input type="checkbox" name="configuracion.visualizar_decimales">
+    </label>
+    <label>
+      <span>Ícono</span>
+      <input name="configuracion.icono">
+    </label>
+    <label>
+      <span>Alto (px)</span>
+      <input name="configuracion.configuracion_general.diseño.alto">
+    </label>
+    <label>
+      <span>Color</span>
+      <input name="configuracion.configuracion_general.diseño.color">
+    </label>
+    <label>
+      <span>Escala del texto</span>
+      <input name="configuracion.configuracion_general.diseño.escala_del_texto">
+    </label>
+    <label>
+      <span>Intensidad del resplandor</span>
+      <input name="configuracion.configuracion_general.diseño.intensidad_resplandor">
+    </label>
+    <label>
+      <span>Mostrar decimales</span>
+      <input type="checkbox" name="configuracion.configuracion_general.diseño.mostrar_decimales">
+    </label>
+    <label>
+      <span>Ocultar texto</span>
+      <input type="checkbox" name="configuracion.configuracion_general.diseño.ocultar_texto">
+    </label>
+    <label>
+      <span>Tipo de borde</span>
+      <select name="configuracion.configuracion_general.diseño.tipo_de_borde">
+        <option value="">Seleccione una opción</option>
+        <option>Redondo</option>
+        <option>Cuadrado</option>
+        <option>Plano</option>
+      </select>
+    </label>
+    <label>
+      <span>Margen interno</span>
+      <input name="configuracion.configuracion_circular.visualizacion.margen_interno">
+    </label>
+    <label>
+      <span>Punto de inicio</span>
+      <select name="configuracion.configuracion_circular.visualizacion.punto_de_inicio">
+        <option value="">Seleccione una opción</option>
+        <option>Arriba</option>
+        <option>Derecha</option>
+        <option>Abajo</option>
+        <option>Izquierda</option>
+      </select>
+    </label>
+    <label>
+      <span>Dirección horario</span>
+      <select name="configuracion.configuracion_circular.visualizacion.direccion_horario">
+        <option value="">Seleccione una opción</option>
+        <option>Horario</option>
+        <option>Antihorario</option>
+      </select>
+    </label>
+    <label>
+      <span>Alineación horizontal</span>
+      <select name="configuracion.configuracion_lineal.visualizacion.alineacion_horizontal">
+        <option value="">Seleccione una opción</option>
+        <option>Izquierda</option>
+        <option>Centro</option>
+        <option>Derecha</option>
+      </select>
+    </label>
+    <label>
+      <span>Alineación vertical</span>
+      <select name="configuracion.configuracion_lineal.visualizacion.alineacion_vertical">
+        <option value="">Seleccione una opción</option>
+        <option>Arriba</option>
+        <option>Abajo</option>
+      </select>
+    </label>
+    <label>
+      <span>Separación</span>
+      <input name="configuracion.configuracion_lineal.visualizacion.separacion">
+    </label>
+  </form>
+</body>
+</html>
