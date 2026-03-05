@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gráfico de Progreso Minimalista</title>
+  <style>
+    /* Estilos base y reseteo */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #050505;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 2rem 0;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
+      max-width: 480px;
+      padding: 2rem;
+    }
+
+    /* --- Escena del Gráfico --- */
+    .graphic-scene {
+      width: 100%;
+      height: 180px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .morph-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      will-change: transform; 
+    }
+
+    .track {
+      fill: none;
+      stroke: #222;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-width 0.3s, stroke-linecap 0.3s;
+    }
+
+    .progress {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 8;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+      transition: stroke-width 0.3s, stroke-linecap 0.3s, stroke 0.3s;
+    }
+
+    #main-text {
+      font-weight: 300;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+      fill: #ffffff;
+      text-anchor: middle;
+      dominant-baseline: middle;
+      transition: opacity 0.3s;
+    }
+
+    /* --- Controles UI Minimalistas --- */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      background: #111;
+      padding: 2rem;
+      border-radius: 16px;
+      border: 1px solid #222;
+    }
+
+    /* Acordeones (Details/Summary) para agrupar controles */
+    details {
+      background: #0a0a0a;
+      border-radius: 10px;
+      border: 1px solid #222;
+      padding: 12px 16px;
+      transition: background 0.3s;
+    }
+
+    details[open] {
+      background: #151515;
+      padding-bottom: 20px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: #fff;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      outline: none;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: '+';
+      color: #888;
+      font-size: 1.2rem;
+      font-weight: 300;
+      transition: transform 0.3s;
+    }
+
+    details[open] summary::after {
+      content: '−';
+      transform: rotate(180deg);
+    }
+
+    .details-content {
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    /* Switch Component */
+    .switch-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #888;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px; width: 16px;
+      left: 4px; bottom: 4px;
+      background-color: white;
+      transition: .4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      border-radius: 50%;
+    }
+
+    input:checked + .slider { background-color: #555; }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    .active-mode {
+      color: #fff;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    /* Inputs y Layout */
+    .config-row { display: flex; gap: 15px; }
+    .input-group { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .input-group.full-width { width: 100%; flex: none; }
+    
+    label {
+      font-size: 0.65rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      background: #000;
+      border: 1px solid #333;
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s;
+      font-family: inherit;
+      appearance: none;
+    }
+
+    input[type="text"]:focus, select:focus { border-color: #fff; }
+
+    /* Input Color Nativo */
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 100%;
+      height: 38px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #000;
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+    input[type="color"]::-webkit-color-swatch {
+      border: 1px solid #333;
+      border-radius: 6px;
+    }
+
+    /* Range Sliders */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+      padding: 10px 0;
+    }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px; width: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      margin-top: -6px;
+      box-shadow: 0 0 5px rgba(255,255,255,0.3);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 4px;
+      cursor: pointer;
+      background: #333;
+      border-radius: 2px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.3s, filter 0.3s;
+      margin-top: 0.5rem;
+    }
+
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <div class="graphic-scene">
+      <svg viewBox="0 0 350 180" class="morph-svg" id="main-svg">
+        <g id="svg-group">
+          <path class="track" id="main-track" />
+          <path class="progress" id="main-progress" />
+        </g>
+        <text id="main-text" font-size="28">0%</text>
+      </svg>
+    </div>
+
+    <!-- Controles -->
+    <div class="controls">
+      
+      <!-- Selector Principal -->
+      <div class="switch-container" style="padding: 0.5rem 1rem;">
+        <span id="label-circle" class="active-mode">Modo Círculo</span>
+        <label class="switch">
+          <input type="checkbox" id="mode-switch">
+          <span class="slider"></span>
+        </label>
+        <span id="label-line">Modo Línea</span>
+      </div>
+
+      <!-- Sección 1: Específicos del Modo -->
+      <details open>
+        <summary>Ajustes de Forma</summary>
+        <div class="details-content">
+          <!-- Controles de Círculo -->
+          <div id="circle-configs" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div class="config-row">
+              <div class="input-group">
+                <label>Punto de Inicio</label>
+                <select id="circle-start">
+                  <option value="0" selected>Abajo</option>
+                  <option value="90">Izquierda</option>
+                  <option value="180">Arriba</option>
+                  <option value="270">Derecha</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Dirección</label>
+                <select id="circle-dir">
+                  <option value="1" selected>Antihorario</option>
+                  <option value="-1">Horario</option>
+                </select>
+              </div>
+            </div>
+            <div class="config-row">
+              <div class="input-group full-width">
+                <label>Margen Interno del Círculo</label>
+                <input type="range" id="circle-margin" min="0" max="25" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Controles de Línea -->
+          <div id="line-configs" style="display: none; flex-direction: column; gap: 1.25rem;">
+            <div class="config-row">
+              <div class="input-group">
+                <label>Alineación Horizontal</label>
+                <select id="line-align">
+                  <option value="left">Izquierda</option>
+                  <option value="center" selected>Centro</option>
+                  <option value="right">Derecha</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Posición Vertical</label>
+                <select id="line-pos">
+                  <option value="above" selected>Arriba</option>
+                  <option value="below">Abajo</option>
+                </select>
+              </div>
+            </div>
+            <div class="config-row">
+              <div class="input-group full-width">
+                <label>Separación de la línea</label>
+                <input type="range" id="line-spacing" min="15" max="45" value="25">
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Sección 2: Estética Compartida -->
+      <details>
+        <summary>Estética, Diseño y Texto</summary>
+        <div class="details-content">
+          <div class="config-row">
+            <div class="input-group">
+              <label>Color Principal</label>
+              <input type="color" id="main-color" value="#ffffff">
+            </div>
+            <div class="input-group">
+              <label>Intensidad Resplandor</label>
+              <input type="range" id="glow-intensity" min="0" max="25" value="8">
+            </div>
+          </div>
+          <div class="config-row">
+            <div class="input-group">
+              <label>Grosor de Barra (px)</label>
+              <input type="range" id="stroke-width" min="2" max="20" value="8">
+            </div>
+            <div class="input-group">
+              <label>Tipo de Extremo</label>
+              <select id="line-cap">
+                <option value="round" selected>Redondo</option>
+                <option value="square">Cuadrado</option>
+                <option value="butt">Plano</option>
+              </select>
+            </div>
+          </div>
+          <hr style="border: 0; height: 1px; background: #222; margin: 0.5rem 0;">
+          <div class="config-row">
+            <div class="input-group">
+              <label>Escala del Texto</label>
+              <input type="range" id="text-scale" min="50" max="150" value="100">
+            </div>
+            <div class="input-group">
+              <label>Mostrar Decimales</label>
+              <div class="switch-container" style="padding-top: 5px;">
+                <label class="switch">
+                  <input type="checkbox" id="show-decimals">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Ocultar Texto</label>
+              <div class="switch-container" style="padding-top: 5px;">
+                <label class="switch">
+                  <input type="checkbox" id="hide-text">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Sección 3: Animación -->
+      <details open>
+        <summary>Animación y Tiempo</summary>
+        <div class="details-content">
+          <div class="config-row">
+            <div class="input-group">
+              <label>Mostrar en Gráfico</label>
+              <select id="display-select">
+                <option value="percentage">Progreso (%)</option>
+                <option value="time">Tiempo (s)</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Aceleración (Easing)</label>
+              <select id="easing-select">
+                <option value="linear" selected>Lineal (Constante)</option>
+                <option value="easeOut">Ease-Out (Lento al final)</option>
+                <option value="easeIn">Ease-In (Lento al inicio)</option>
+                <option value="easeInOut">Ease-In-Out (Suave)</option>
+              </select>
+            </div>
+          </div>
+          <div class="config-row">
+            <div class="input-group">
+              <label>Duración</label>
+              <input type="text" id="duration-input" value="5" placeholder="Ej: 5">
+            </div>
+            <div class="input-group">
+              <label>Unidad</label>
+              <select id="unit-select">
+                <option value="1">Segundos</option>
+                <option value="60">Minutos</option>
+                <option value="3600">Horas</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Auto-Loop</label>
+              <div class="switch-container" style="padding-top: 5px;">
+                <label class="switch">
+                  <input type="checkbox" id="loop-anim">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <button id="start-btn">Iniciar Animación</button>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Elementos Principales SVG
+      const mainSvg = document.getElementById('main-svg');
+      const svgGroup = document.getElementById('svg-group');
+      const mainTrack = document.getElementById('main-track');
+      const mainProgress = document.getElementById('main-progress');
+      const mainText = document.getElementById('main-text');
+      
+      const modeSwitch = document.getElementById('mode-switch');
+      const labelCircle = document.getElementById('label-circle');
+      const labelLine = document.getElementById('label-line');
+      
+      // Contenedores de Secciones
+      const circleConfigs = document.getElementById('circle-configs');
+      const lineConfigs = document.getElementById('line-configs');
+
+      // Inputs Forma
+      const circleStart = document.getElementById('circle-start');
+      const circleDir = document.getElementById('circle-dir');
+      const circleMargin = document.getElementById('circle-margin');
+      const lineAlign = document.getElementById('line-align');
+      const linePos = document.getElementById('line-pos');
+      const lineSpacing = document.getElementById('line-spacing');
+
+      // Inputs Estética
+      const mainColor = document.getElementById('main-color');
+      const glowIntensity = document.getElementById('glow-intensity');
+      const strokeWidth = document.getElementById('stroke-width');
+      const lineCap = document.getElementById('line-cap');
+      const textScale = document.getElementById('text-scale');
+      const showDecimals = document.getElementById('show-decimals');
+      const hideText = document.getElementById('hide-text');
+
+      // Inputs Animación
+      const durationInput = document.getElementById('duration-input');
+      const unitSelect = document.getElementById('unit-select');
+      const displaySelect = document.getElementById('display-select');
+      const easingSelect = document.getElementById('easing-select');
+      const loopAnim = document.getElementById('loop-anim');
+      const startBtn = document.getElementById('start-btn');
+
+      // --- Funciones Matemáticas ---
+      let R = 40; 
+      let L = 2 * Math.PI * R; 
+      const basePathY = 125; 
+      const svgCenter = 175; 
+      let cx = svgCenter - L / 2; 
+
+      // Curvas de Aceleración (Easings)
+      const easings = {
+        linear: t => t,
+        easeIn: t => t * t,
+        easeOut: t => t * (2 - t),
+        easeInOut: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+      };
+
+      // Curva para la transformación Forma (Morph)
+      function easeInOutCubic(x) {
+        return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+      }
+
+      mainProgress.style.strokeDasharray = L;
+      mainProgress.style.strokeDashoffset = L;
+
+      // Variables de Estado
+      let morphT = 0; 
+      let progressP = 0; 
+      let rawT = 0; // Tiempo puro de animación 0 a 1 (antes del easing)
+      
+      let morphAnimId;
+      let progressAnimId;
+      let progressStartTime = null;
+      let activeTotalMs = 0;
+      let loopTimeout = null;
+
+      // --- Estilos Compartidos (Colors, Stroke, Font) ---
+      function applySharedStyles() {
+        const color = mainColor.value;
+        const glow = glowIntensity.value;
+        const sw = strokeWidth.value;
+        const cap = lineCap.value;
+        
+        mainProgress.style.stroke = color;
+        mainProgress.style.filter = glow > 0 ? `drop-shadow(0 0 ${glow}px ${color})` : 'none';
+        
+        mainTrack.style.strokeWidth = sw;
+        mainProgress.style.strokeWidth = sw;
+        mainTrack.style.strokeLinecap = cap;
+        mainProgress.style.strokeLinecap = cap;
+
+        mainText.style.opacity = hideText.checked ? '0' : '1';
+        
+        // El color del texto también puede coincidir o quedarse blanco. Lo dejamos blanco para legibilidad,
+        // pero podrías cambiar `mainText.style.fill = color;` si lo prefieres.
+      }
+
+      // --- Generador de Path (Morphing) ---
+      function getPathD(t) {
+        const l = t * L; 
+        const cy = basePathY - R; 
+        
+        if (t === 0) {
+          return `M ${cx} ${basePathY} A ${R} ${R} 0 1 0 ${cx} ${cy - R} A ${R} ${R} 0 1 0 ${cx} ${basePathY}`;
+        }
+
+        const alpha = (1 - t) * 2 * Math.PI;
+        const startAngle = Math.PI / 2 + alpha;
+
+        const startX_arc = cx + R * Math.cos(startAngle);
+        const startY_arc = cy + R * Math.sin(startAngle);
+
+        let d = `M ${startX_arc} ${startY_arc}`;
+
+        if (t < 1) {
+          const largeArc = alpha > Math.PI ? 1 : 0;
+          d += ` A ${R} ${R} 0 ${largeArc} 0 ${cx} ${basePathY}`;
+        } else {
+          d = `M ${cx} ${basePathY}`;
+        }
+
+        if (t > 0) d += ` L ${cx + l} ${basePathY}`;
+        return d;
+      }
+
+      function updateMorphRender() {
+        // Configuraciones de Círculo
+        const cMarginVal = parseInt(circleMargin.value);
+        const startAngleDeg = parseInt(circleStart.value);
+        
+        // Configuraciones de Línea
+        const lAlignVal = lineAlign.value;
+        const lPosVal = linePos.value;
+        const lSpacingVal = parseInt(lineSpacing.value);
+
+        // Dinámica de dimensiones
+        R = 40 + cMarginVal; 
+        L = 2 * Math.PI * R; 
+        cx = svgCenter - L / 2; 
+        const cy = basePathY - R;
+
+        // Trazado
+        const d = getPathD(morphT);
+        mainTrack.setAttribute('d', d);
+        mainProgress.setAttribute('d', d);
+
+        // Manejo del Punto de Inicio
+        const currentAngle = startAngleDeg * (1 - morphT);
+        svgGroup.setAttribute('transform', `rotate(${currentAngle}, ${cx}, ${cy})`);
+
+        // Transformación CSS para Centrado Constante
+        const requiredShift = svgCenter - cx; 
+        const currentShift = (1 - morphT) * requiredShift;
+        mainSvg.style.transform = `translateX(${currentShift}px)`;
+
+        // Tipografía Base y Escala
+        const scale = parseInt(textScale.value) / 100;
+        const baseX = cx;
+        const baseY = basePathY - R + 2;
+        const baseFontSize = 28 * scale; 
+
+        let targetX = cx + L / 2; 
+        if (lAlignVal === 'left') targetX = cx + 35; 
+        if (lAlignVal === 'right') targetX = cx + L - 35; 
+
+        let targetY = basePathY - lSpacingVal; 
+        if (lPosVal === 'below') targetY = basePathY + lSpacingVal + 5; 
+
+        const targetFontSize = 22 * scale;
+
+        const textX = baseX + morphT * (targetX - baseX);
+        const textY = baseY + morphT * (targetY - baseY);
+        const fontSize = baseFontSize + morphT * (targetFontSize - baseFontSize);
+
+        mainText.setAttribute('x', textX);
+        mainText.setAttribute('y', textY);
+        mainText.setAttribute('font-size', fontSize);
+
+        updateProgressRender();
+      }
+
+      function getTotalMsFromInputs() {
+        const val = parseFloat(durationInput.value) || 0;
+        return val * parseFloat(unitSelect.value) * 1000;
+      }
+
+      function updateProgressRender() {
+        const dir = parseInt(circleDir.value); 
+        
+        if (progressP === 0) {
+          mainProgress.style.opacity = 0;
+        } else {
+          mainProgress.style.opacity = 1;
+        }
+
+        const targetSegStart = (dir === 1) ? 0 : (L - progressP * L);
+        const currentSegStart = targetSegStart * (1 - morphT); 
+
+        mainProgress.style.strokeDasharray = `${progressP * L} ${L}`;
+        mainProgress.style.strokeDashoffset = -currentSegStart;
+        
+        const showDec = showDecimals.checked;
+
+        if (displaySelect.value === 'percentage') {
+          const val = progressP * 100;
+          mainText.textContent = (showDec ? val.toFixed(1) : Math.floor(val)) + '%';
+        } else {
+          const totalSecs = (activeTotalMs > 0 ? activeTotalMs : getTotalMsFromInputs()) / 1000;
+          const val = progressP * totalSecs;
+          mainText.textContent = (showDec ? val.toFixed(1) : Math.floor(val)) + 's';
+        }
+      }
+
+      // --- Setup Inicial ---
+      applySharedStyles();
+      updateMorphRender();
+
+      // --- Eventos ---
+      // Forma y Comportamiento Específico
+      circleStart.addEventListener('change', updateMorphRender);
+      circleDir.addEventListener('change', updateProgressRender);
+      circleMargin.addEventListener('input', updateMorphRender);
+      lineAlign.addEventListener('change', updateMorphRender);
+      linePos.addEventListener('change', updateMorphRender);
+      lineSpacing.addEventListener('input', updateMorphRender);
+
+      // Estética Compartida
+      mainColor.addEventListener('input', applySharedStyles);
+      glowIntensity.addEventListener('input', applySharedStyles);
+      strokeWidth.addEventListener('input', applySharedStyles);
+      lineCap.addEventListener('change', applySharedStyles);
+      
+      // Tipografía
+      textScale.addEventListener('input', updateMorphRender);
+      showDecimals.addEventListener('change', updateProgressRender);
+      hideText.addEventListener('change', applySharedStyles);
+      displaySelect.addEventListener('change', updateProgressRender);
+
+      // Alternador de Modo
+      modeSwitch.addEventListener('change', (e) => {
+        const targetMorphT = e.target.checked ? 1 : 0;
+        const startMorphT = morphT;
+        const MORPH_DURATION = 800; 
+        let morphStartTime = null;
+
+        if (e.target.checked) {
+          labelLine.classList.add('active-mode');
+          labelCircle.classList.remove('active-mode');
+          circleConfigs.style.display = 'none';
+          lineConfigs.style.display = 'flex';
+        } else {
+          labelCircle.classList.add('active-mode');
+          labelLine.classList.remove('active-mode');
+          circleConfigs.style.display = 'flex';
+          lineConfigs.style.display = 'none';
+        }
+
+        cancelAnimationFrame(morphAnimId);
+        
+        const animateMorph = (timestamp) => {
+          if (!morphStartTime) morphStartTime = timestamp;
+          const elapsed = timestamp - morphStartTime;
+          let factor = Math.min(elapsed / MORPH_DURATION, 1);
+          factor = easeInOutCubic(factor);
+          
+          morphT = startMorphT + (targetMorphT - startMorphT) * factor;
+          updateMorphRender();
+          
+          if (elapsed < MORPH_DURATION) {
+            morphAnimId = requestAnimationFrame(animateMorph);
+          } else {
+            morphT = targetMorphT;
+            updateMorphRender();
+          }
+        };
+        morphAnimId = requestAnimationFrame(animateMorph);
+      });
+
+      // Validación de Tiempo
+      durationInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9.]/g, '');
+        if((this.value.match(/\./g) || []).length > 1) {
+          this.value = this.value.substring(0, this.value.length - 1);
+        }
+        if(!activeTotalMs) updateProgressRender(); 
+      });
+
+      // Lógica de Inicio de Animación
+      startBtn.addEventListener('click', () => {
+        const val = parseFloat(durationInput.value);
+        if (isNaN(val) || val <= 0) {
+          durationInput.style.borderColor = "#ff4444";
+          setTimeout(() => durationInput.style.borderColor = "#333", 1500);
+          return;
+        }
+
+        clearTimeout(loopTimeout);
+        activeTotalMs = getTotalMsFromInputs();
+        
+        cancelAnimationFrame(progressAnimId);
+        progressStartTime = null;
+        startBtn.disabled = true;
+        
+        // Cambiar el color temporalmente para feedback visual de activo
+        const currentBtnText = startBtn.textContent;
+        startBtn.textContent = 'En progreso...';
+        startBtn.style.filter = 'brightness(0.7)';
+
+        const selectedEasing = easings[easingSelect.value] || easings.linear;
+
+        const animateProgress = (timestamp) => {
+          if (!progressStartTime) progressStartTime = timestamp;
+          const elapsed = timestamp - progressStartTime;
+          
+          rawT = Math.min(elapsed / activeTotalMs, 1);
+          progressP = selectedEasing(rawT); // Aplica la aceleración
+          updateProgressRender();
+
+          if (rawT < 1) {
+            progressAnimId = requestAnimationFrame(animateProgress);
+          } else {
+            startBtn.style.filter = '';
+            
+            if (loopAnim.checked) {
+              startBtn.textContent = 'Reiniciando...';
+              // Esperar un segundo y reiniciar el loop
+              loopTimeout = setTimeout(() => {
+                if (loopAnim.checked) startBtn.click();
+              }, 1000);
+            } else {
+              startBtn.disabled = false;
+              startBtn.textContent = 'Reiniciar Animación';
+              activeTotalMs = 0; 
+            }
+          }
+        };
+        progressAnimId = requestAnimationFrame(animateProgress);
+      });
+    });
+  </script>
+</body>
+</html>
