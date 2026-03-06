@@ -121,7 +121,7 @@ form {
   padding: .5lh 1lh;
 
   &:focus-visible {
-    outline: 0.5px solid royalblue;
+    outline: 2px solid var(--color-primary);
     background-color: black;
   }
 }
@@ -215,18 +215,14 @@ fieldset {
 }
 
 input[type="checkbox"] {
-  /* background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e"); */
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: var(--color-primary);
   cursor: pointer;
   height: 36px;
+  margin: 0;
   padding: 0;
   position: relative;
   transform: scale(0.75) translateX(-7px);
   width: 36px;
-  margin: 0;
-  
+
   &:after, &:before {
     background-color: white;
     border-radius: 10px;
@@ -242,6 +238,7 @@ input[type="checkbox"] {
 
       border-radius: 1lh;
       corner-shape: squircle;
+      background-color: rgb(31 31 34);
       height: var(--size);
       left: 50%;
       top: 50%;
@@ -263,7 +260,7 @@ input[type="checkbox"] {
   &:checked {
 
     &:after {
-      animation: checkmark-after .5s ease-in-out forwards;
+      animation: checkmark-after .5s linear forwards;
       corner-shape: round;
       height: 6px;
       left: 6px;
@@ -273,7 +270,7 @@ input[type="checkbox"] {
     }
 
     &:before {
-      animation: checkmark-before 1s ease-in-out forwards;
+      animation: checkmark-before 1s linear forwards;
       height: 6px;
       left: 16px;
       top: 22px;
@@ -289,8 +286,7 @@ input[type="checkbox"] {
   }
 
   &:focus-visible {
-    outline: 0.5px solid white;
-    outline-offset: 0;
+    outline: none;
   }
 }
 
@@ -307,6 +303,13 @@ label {
   &:has(select:focus-visible) span,
   &:has(input:focus-visible) span {
     color: var(--color-primary);
+  }
+
+  &:hover {
+
+    span {
+      color: var(--color-primary);
+    }
   }
 
   span {
@@ -368,6 +371,8 @@ summary {
     top: 50%;
     transform: translate(-50%, -50%) rotate(0deg);
     width: 30px;
+  }
+  15% {
   }
   50% {
     height: 6px;
