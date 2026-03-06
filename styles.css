@@ -148,6 +148,10 @@ label {
   grid-template-columns: 1fr 2fr;
   align-items: center;
 
+  &:has(input[type="hidden"]) {
+    display: none;
+  }
+
   span {
     text-align: right;
   }
@@ -243,62 +247,79 @@ summary {
 }
 
 
-label:has(input[type="checkbox"]) {
-  &:has(hr) input[type="checkbox"]{
-    display: none;
-  }
-  &:hover {
+label:has(input[type="checkbox"]):has(hr) {
+
+  &:has(input[type="checkbox"]:checked) {
     hr {
       background-color: royalblue;
-      width: 2.25rem;
-      border-radius: 1rem;
-      height: 1rem;
-
-      &:before {
-        width: 8px;
-        transform: rotate(0) translate(-50%, -50%) scale(2.5);
-      }
     }
   }
 
+  &:has(input[type="checkbox"]:focus) {
+    hr {
+      outline: 0.5px solid royalblue;
+      border-radius: 30px;
+      corner-shape: round;
+      aspect-ratio: 1 / 2;
+      width: 60px;
+
+      &:after {
+        transform: translate(150%, -50%) rotate(-45deg) scale(5) !important;
+        transition: width .15s ease-in-out, transform .25s ease-in-out .15s;
+      }
+
+      &:after,
+      &:before {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 6px;
+      }
+    }
+  }
+  
   hr {
-    background-color: black;
-    border-radius: .25lh;
+    --color: white;
+    
+    background-color: rgba(0, 0, 0, 0.25);
+    /* background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e"); */
+    border-radius: 1lh;
     border: none;
-    height: 1.5rem;
+    color: white;
+    corner-shape: squircle;
+    field-sizing: content;
+    font-size: 1rem;
+    height: 36px;
+    width: 36px;
+    padding: .5lh 1lh;
+    /* transform: scale(0.5); */
+    transition: corner-shape .15s ease-in-out, width .25s ease-in-out .15s;
     position: relative;
-    transition: .25s ease-in-out;
-    width: 1.5rem;
-    overflow: visible;
 
     &:after,
     &:before {
-      background-color: white !important;
-      border-radius: 20px;
-      left: 50%;
+      background-color: var(--color);
+      border-radius: 1lh;
+      content: "";
       position: absolute;
-      top: 50%;
       transition: .25s ease-in-out;
     }
     
     &:after {
-      content: "";
-      display: block;
-      width: 13px;
-      height: 8px;
-      background-color: rgba(255, 255, 255, 0.75);
-      transform-origin: right;
-      transform: rotate(45deg) translate(-5.5px, 6px);
+      height: 6px;
+      left: 11px;
+      top: 15px;
+      transform: rotate(-45deg);
+      width: 21px;
     }
 
     &:before {
-      content: "";
-      display: block;
-      width: 20px;
-      height: 8px;
-      background-color: rgba(255, 0, 0, 0.75);
-      transform-origin: left;
-      transform: rotate(-45deg);
+      background-color: var(--color);
+      height: 6px;
+      left: 7px;
+      top: 18px;
+      transform: rotate(45deg);
+      width: 13px;
     }
   }
 }

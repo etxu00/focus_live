@@ -34,6 +34,7 @@
           <span>Nombre</span>
           <input
             autocomplete="off"
+            id="input_nombre"
             name="nombre"
             placeholder="¿Bienvenida?, ¿Descanzo? El cielo es el límite..."
             required
@@ -76,6 +77,13 @@
           </div>
         </fieldset>
         <label>
+          <span>Visualización</span>
+          <select id="select_visualization" name="configuracion.visualizacion">
+            <option selected>Tiempo</option>
+            <option>Porcentaje</option>
+          </select>
+        </label>
+        <label>
           <span>Cuenta regresiva</span>
           <input type="checkbox" name="configuracion.cuenta_regresiva">
           <hr>
@@ -83,13 +91,6 @@
         <label>
           <span>Tiempo restante (%)</span>
           <input name="configuracion.tiempo_restante">
-        </label>
-        <label>
-          <span>Visualización</span>
-          <select id="select_visualization" name="configuracion.visualizacion">
-            <option selected>Tiempo</option>
-            <option>Porcentaje</option>
-          </select>
         </label>
       </section>
     </details>
@@ -227,7 +228,7 @@
       ⏹️ Detener
     </button>
   </form>
-  <pre><code></code></pre>
+  <!--pre><code></code></pre-->
   <script src="index.js"></script>
   </body>
 

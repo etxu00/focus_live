@@ -24,6 +24,7 @@ const $inputGrosorBarra = $('#input_grosor_barra')
 const $inputIntensidadResplandor = $('#input_intensidad_resplandor')
 const $inputMargenInterno = $('#input_margen_interno')
 const $inputMostrarDecimales = $('#input_mostrar_decimales')
+const $inputNombre = $('#input_nombre')
 const $inputOcultarTexto = $('#input_ocultar_texto')
 const $inputSeparacion = $('#input_separacion')
 const $selectAlineacionHorizontal = $('#select_alineacion_horizontal')
@@ -247,6 +248,7 @@ function updateMorphRender() {
  */
 function updateTitileTag() {
   const showDec = $inputMostrarDecimales.checked
+  const name = $inputNombre.value
   let title = ''
 
   if ($selectVisualization.value === 'Porcentaje') {
@@ -258,7 +260,7 @@ function updateTitileTag() {
     title = (showDec ? val.toFixed(1) : Math.floor(val)) + 's'
   }
 
-  document.title = title
+  document.title = name + ': ' + title
 }
 
 function updateProgressRender() {
