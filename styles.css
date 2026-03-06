@@ -1,81 +1,81 @@
 *,
 *::before,
 *::after {
- box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
- --margin: 1rem;
+  --margin: 1rem;
 
- background-color: #202124;
- color: white;
- display: flex;
- font-family: System-ui, Arial, Helvetica, sans-serif;
- gap: var(--margin);
- margin: var(--margin);
+  background-color: #202124;
+  color: white;
+  display: flex;
+  font-family: System-ui, Arial, Helvetica, sans-serif;
+  gap: var(--margin);
+  margin: var(--margin);
 
- &>* {
+  &>* {
    /* border: 1px solid; */
-   flex: 1;
-   margin: 0;
-   padding: var(--margin);
- }
+    flex: 1;
+    margin: 0;
+    padding: var(--margin);
+  }
 
- main {
-   order: 3;
- }
+  main {
+    order: 3;
+  }
 
- pre {
-   order: 1;
- }
+  pre {
+    order: 1;
+  }
 
- form {
-   order: 2;
- }
+  form {
+    order: 2;
+  }
 }
 
 main {
- display: grid;
- place-items: center;
+  display: grid;
+  place-items: center;
 
- svg {
-   height: 100%;
-   overflow: visible;
-   width: 100%;
-   will-change: transform;
+  svg {
+    height: 100%;
+    overflow: visible;
+    width: 100%;
+    will-change: transform;
 
-   text {
-     dominant-baseline: middle;
-     fill: #ffffff;
-     font-variant-numeric: tabular-nums;
-     font-weight: 300;
-     letter-spacing: 1px;
-     text-anchor: middle;
-     transition: opacity 0.3s;
-   }
+    text {
+      dominant-baseline: middle;
+      fill: #ffffff;
+      font-variant-numeric: tabular-nums;
+      font-weight: 300;
+      letter-spacing: 1px;
+      text-anchor: middle;
+      transition: opacity 0.3s;
+    }
 
-   :is(.progress, .track) {
-     fill: none;
-     stroke-linecap: round;
-     stroke-width: 8;
-   }
+    :is(.progress, .track) {
+      fill: none;
+      stroke-linecap: round;
+      stroke-width: 8;
+    }
 
-   .progress {
-     filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
-     stroke: #ffffff;
-     transition: stroke-width 0.3s, stroke-linecap 0.3s, stroke 0.3s;
-   }
+    .progress {
+      filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+      stroke: #ffffff;
+      transition: stroke-width 0.3s, stroke-linecap 0.3s, stroke 0.3s;
+    }
 
-   .track {
-     stroke: #222;
-     transition: stroke-width 0.3s, stroke-linecap 0.3s;
-   }
- }
+    .track {
+      stroke: #222;
+      transition: stroke-width 0.3s, stroke-linecap 0.3s;
+    }
+  }
 }
 
 code,
 pre {
- color: white;
+  color: white;
 }
 
 
