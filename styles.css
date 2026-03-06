@@ -1,3 +1,7 @@
+:root {
+  --color-primary: royalblue;
+}
+
 *,
 *::before,
 *::after {
@@ -79,18 +83,67 @@ pre {
 }
 
 
+form {
+  margin: 0 auto;
+  max-width: 800px;
+
+  header {
+    align-items: center;
+    display: flex;
+    gap: .5lh;
+
+    input {
+      flex: 1;
+    }
+
+    button:first-of-type {
+      background-color: var(--color-primary);
+    }
+
+    button-group {
+      display: flex;
+      flex-direction: row-reverse;
+      gap: .5lh;
+    }
+  }
+}
 
 /* FORMULARIOS */
-
-button {
-  background: royalblue;
+:is(input, select) {
+  appearance: none;
+  background-color: rgba(0, 0, 0, 0.25);
   border-radius: 1lh;
   border: none;
   color: white;
   corner-shape: squircle;
+  field-sizing: content;
+  font-size: 1rem;
+  padding: .5lh 1lh;
+
+  &:focus-visible {
+    outline: 0.5px solid royalblue;
+    background-color: black;
+  }
+}
+
+button {
+  background: #202124;
+  border-radius: 1lh;
+  border: none;
+  color: white;
+  corner-shape: squircle;
+  cursor: pointer;
   font-size: 1rem;
   padding: .5lh 1lh;
   text-align: center;
+
+  &:has([type="reset"]) {
+    background: #292a2d;
+  }
+
+  &:hover {
+    filter: brightness(1.25)
+  }
 }
 
 details {
@@ -117,43 +170,6 @@ details {
       background-color: #292a2d;
       padding: 1lh;
     }
-  }
-}
-
-form {
-  /* display: grid;
-  gap: 1lh; */
-
-}
-
-:is(input, select) {
-  border-radius: 1lh;
-  border: none;
-  corner-shape: squircle;
-  field-sizing: content;
-  font-size: 1rem;
-  padding: .5lh 1lh;
-  background-color: rgba(0, 0, 0, 0.25);
-  color: white;
-
-  &:focus-visible {
-    outline: 0.5px solid royalblue;
-    background-color: black;
-  }
-}
-
-label {
-  display: grid;
-  gap: .5lh;
-  grid-template-columns: 1fr 2fr;
-  align-items: center;
-
-  &:has(input[type="hidden"]) {
-    display: none;
-  }
-
-  span {
-    text-align: right;
   }
 }
 
@@ -198,6 +214,106 @@ fieldset {
   }
 }
 
+input[type="checkbox"] {
+  /* background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e"); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: var(--color-primary);
+  cursor: pointer;
+  height: 36px;
+  padding: 0;
+  position: relative;
+  transform: scale(0.75) translateX(-7px);
+  width: 36px;
+  margin: 0;
+  
+  &:after, &:before {
+    background-color: white;
+    border-radius: 10px;
+    content: '';
+    display: block;
+    position: absolute;
+  }
+
+  &:not(:checked) {
+
+    &:after {
+      --size: 30px;
+
+      border-radius: 1lh;
+      corner-shape: squircle;
+      height: var(--size);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) rotate(0deg);
+      width: var(--size);
+    }
+  
+    &:before {
+      opacity: 0;
+      left: 16px;
+      top: 22px;
+      transform-origin: bottom right;
+      transform: rotate(-45deg);
+      width: 21px;
+    }
+  }
+  
+
+  &:checked {
+
+    &:after {
+      animation: checkmark-after .5s ease-in-out forwards;
+      corner-shape: round;
+      height: 6px;
+      left: 6px;
+      top: 18px;
+      transform: rotate(45deg);
+      width: 14px;
+    }
+
+    &:before {
+      animation: checkmark-before 1s ease-in-out forwards;
+      height: 6px;
+      left: 16px;
+      top: 22px;
+      transform-origin: bottom left;
+      transform: rotate(-45deg);
+      width: 21px;
+    }
+  }
+
+  &:hover,
+  &:focus-visible {
+    background-color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 0.5px solid white;
+    outline-offset: 0;
+  }
+}
+
+label {
+  display: grid;
+  gap: .5lh;
+  grid-template-columns: 1fr 2fr;
+  align-items: center;
+
+  &:has(input[type="hidden"]) {
+    display: none;
+  }
+
+  &:has(select:focus-visible) span,
+  &:has(input:focus-visible) span {
+    color: var(--color-primary);
+  }
+
+  span {
+    text-align: right;
+  }
+}
+
 section {
   margin-top: .5lh;
   border-radius: 1lh;
@@ -208,7 +324,6 @@ section {
   transition: .25s ease-in-out;
 }
 
-/* Modificación del marker por 🕒 */
 summary {
   cursor: pointer;
   display: flex;
@@ -246,80 +361,49 @@ summary {
   }
 }
 
-
-label:has(input[type="checkbox"]):has(hr) {
-
-  &:has(input[type="checkbox"]:checked) {
-    hr {
-      background-color: royalblue;
-    }
+@keyframes checkmark-after {
+  0% {
+    height: 30px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    width: 30px;
   }
-
-  &:has(input[type="checkbox"]:focus) {
-    hr {
-      outline: 0.5px solid royalblue;
-      border-radius: 30px;
-      corner-shape: round;
-      aspect-ratio: 1 / 2;
-      width: 60px;
-
-      &:after {
-        transform: translate(150%, -50%) rotate(-45deg) scale(5) !important;
-        transition: width .15s ease-in-out, transform .25s ease-in-out .15s;
-      }
-
-      &:after,
-      &:before {
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 6px;
-      }
-    }
+  50% {
+    height: 6px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    width: 6px;
   }
-  
-  hr {
-    --color: white;
-    
-    background-color: rgba(0, 0, 0, 0.25);
-    /* background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e"); */
-    border-radius: 1lh;
-    border: none;
-    color: white;
-    corner-shape: squircle;
-    field-sizing: content;
-    font-size: 1rem;
-    height: 36px;
-    width: 36px;
-    padding: .5lh 1lh;
-    /* transform: scale(0.5); */
-    transition: corner-shape .15s ease-in-out, width .25s ease-in-out .15s;
-    position: relative;
+  51% {
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+  100% {
+    left: 6px;
+    transform: translate(0, 0) rotate(45deg);
+    width: 14px;
+    top: 18px;
+  }
+}
 
-    &:after,
-    &:before {
-      background-color: var(--color);
-      border-radius: 1lh;
-      content: "";
-      position: absolute;
-      transition: .25s ease-in-out;
-    }
-    
-    &:after {
-      height: 6px;
-      left: 11px;
-      top: 15px;
-      transform: rotate(-45deg);
-      width: 21px;
-    }
-
-    &:before {
-      background-color: var(--color);
-      height: 6px;
-      left: 7px;
-      top: 18px;
-      transform: rotate(45deg);
-      width: 13px;
-    }
+@keyframes checkmark-before {
+  0% {
+    height: 6px;
+    opacity: 0;
+    width: 6px;
+  }
+  50% {
+    height: 6px;
+    opacity: 0;
+    width: 6px;
+  }
+  51% {
+    opacity: 1;
+  }
+  100% {
+    height: 6px;
+    opacity: 1;
+    width: 21px;
   }
 }

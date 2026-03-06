@@ -9,7 +9,7 @@
 </head>
 
 <body>
-  <main>
+  <main style="display: none;">
     <svg id="svg" viewBox="0 0 350 180">
       <g id="svg_group">
         <path class="track" id="svg_track" />
@@ -19,10 +19,14 @@
     </svg>
   </main>
   <form>
-    <h3>Bloque de tiempo</h3>
-    <input type="search" placeholder="Buscar...">
-    <button type="reset">Cancelar</button>
-    <button>Guardar</button>
+    <header>
+      <h3>Bloque de tiempo</h3>
+      <input type="search" placeholder="Buscar...">
+      <button-group>
+        <button>Guardar</button>
+        <button type="reset">Cancelar</button>
+      </button-group>
+    </header>
     <label>
       <span>Id</span>
       <input name="id" type="hidden" readonly>
@@ -86,7 +90,6 @@
         <label>
           <span>Cuenta regresiva</span>
           <input type="checkbox" name="configuracion.cuenta_regresiva">
-          <hr>
         </label>
         <label>
           <span>Tiempo restante (%)</span>
